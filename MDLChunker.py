@@ -1,12 +1,16 @@
 
 # coding: utf-8
 
-# # MDL Chunker
+import numpy as np
 
-# In[98]:
+import sys
+
+import time
+
+# In[98]:rend une liste avec les longueurs de chaque syllabe du lexique
 
 def ll(b):
-# rend une liste avec les longueurs de chaque syllabe du lexique
+
     r=[]
     for i in range(len(b)):
         r+=[len(b[i])]
@@ -15,7 +19,7 @@ def ll(b):
 ll(["10","1","0"])
 
 
-# In[99]:
+# In[99]: Découper un texte avec un lexique donné
 
 def cutting(a,b):
     # a est le stream à découper, b le lexique avec lequel on le fait
@@ -29,33 +33,17 @@ def cutting(a,b):
     return cutstream
 
 
-# In[100]:
-
-import numpy as np
-
-
-# In[101]:
-
-import sys
-
-
-# In[102]:
-
-import time
-
-
-# In[103]:
+# In[103]: calcule la factorielle de n (entier >= 0)
 
 def fact(n):
-    """fact(n): calcule la factorielle de n (entier >= 0)"""
+    
     if n<2:
         return 1
     else:
         return n*fact(n-1)
  
 
-
-# In[104]:
+# In[104]: trouve la complexité d'un texte sachant un lexique
 
 def find_complexity(texte,lexi):
     union=[]
@@ -75,7 +63,7 @@ def find_complexity(texte,lexi):
     return(complexity)
 
 
-# In[105]:
+# In[105]: première fonction pour proposer un nouveau lexique de longueur de syllabes <=nb
 
 def concatenate(lexi,nb):
     new_lexi=lexi
@@ -91,9 +79,16 @@ def concatenate(lexi,nb):
     return new_lexi
 
 
-# # Code principal
+# In[110]: Propose un nouveau lexique 
 
-# In[106]:
+def new_lexical(lexi0,best_lexical):
+    lexi=best_lexical+lexi0
+    lexi=list(set(lexi))
+    lexi=sorted(lexi, key=len)
+    lexi.reverse()
+    return lexi
+
+# In[106]: Code principal 1ère version
 
 def find_best_lexical(lexi,texte,nb):
 
@@ -160,7 +155,7 @@ def find_best_lexical(lexi,texte,nb):
 
 
 
-# In[107]:
+# In[107]: Traitement du string initial
 
 def extract_words(string):
     string=string.replace('.','')
@@ -174,7 +169,7 @@ def extract_words(string):
     return texte
 
 
-# In[108]:
+# In[108]: Définir lexique initial "canonical chunks"
 
 def initial_lexical(texte):
     lexi=[]
@@ -185,104 +180,27 @@ def initial_lexical(texte):
     return lexi
 
 
-# In[109]:
+# In[109]: 
 
 string="This process corresponds to an encoding of the input stimuli described using only the canonical chunks into a new representation in terms of the extended alphabet containing all the Chunks. Among all possible encodings, the aim is to find the shortest one. The factorization of each stimulus is generally not unique, and finding the shortest encoding is not trivial when chunks overlap."
-string="this solemn hour it is a consolation to recall and to dwell upon our repeated efforts for peace. All have been ill-starred, but all have been faithful and sincere. This is of the highest moral value--and not only moral value, but practical value--at the present time, because the wholehearted concurrence of scores of millions of men and women, whose co-operation is indispensable and whose comradeship and brotherhood are indispensable, is the only foundation upon which the trial and tribulation of modern war can be endured and surmounted. This moral conviction alone affords that ever-fresh resilience which renews the strength and energy of people in long, doubtful and dark days. Outside, the storms of war may blow and the lands may be lashed with the fury of its gales, but in our own hearts this Sunday morning there is peace. Our hands may be active, but our consciences are at rest. We must not underrate the gravity of the task which lies before us or the temerity of the ordeal, to which we shall not be found unequal. We must expect many disappointments, and many unpleasant surprises, but we may be sure that the task which we have freely accepted is one not beyond the compass and the strength of the British Empire and the French Republic. The Prime Minister said it was a sad day, and that is indeed true, but at the present time there is another note which may be present, and that is a feeling of thankfulness that, if these great trials were to come upon our Island, there is a generation of Britons here now ready to prove itself not unworthy of the days of yore and not unworthy of those great men, the fathers of our land, who laid the foundations of our laws and shaped the greatness of our country." 
+string="In this solemn hour it is a consolation to recall and to dwell upon our repeated efforts for peace. All have been ill-starred, but all have been faithful and sincere. This is of the highest moral value--and not only moral value, but practical value--at the present time, because the wholehearted concurrence of scores of millions of men and women, whose co-operation is indispensable and whose comradeship and brotherhood are indispensable, is the only foundation upon which the trial and tribulation of modern war can be endured and surmounted. This moral conviction alone affords that ever-fresh resilience which renews the strength and energy of people in long, doubtful and dark days. Outside, the storms of war may blow and the lands may be lashed with the fury of its gales, but in our own hearts this Sunday morning there is peace. Our hands may be active, but our consciences are at rest. We must not underrate the gravity of the task which lies before us or the temerity of the ordeal, to which we shall not be found unequal. We must expect many disappointments, and many unpleasant surprises, but we may be sure that the task which we have freely accepted is one not beyond the compass and the strength of the British Empire and the French Republic. The Prime Minister said it was a sad day, and that is indeed true, but at the present time there is another note which may be present, and that is a feeling of thankfulness that, if these great trials were to come upon our Island, there is a generation of Britons here now ready to prove itself not unworthy of the days of yore and not unworthy of those great men, the fathers of our land, who laid the foundations of our laws and shaped the greatness of our country." 
 texte=extract_words(string)
 lexi0=initial_lexical(texte)
 
-
-# In[110]:
-
-def new_lexical(lexi0,best_lexical):
-    lexi=best_lexical+lexi0
-    lexi=list(set(lexi))
-    lexi=sorted(lexi, key=len)
-    lexi.reverse()
-    return lexi
-
-
-# # Chunk
-# 
-
-# In[126]:
-
-lexi0=initial_lexical(texte)
-C=lexi0[:]
-for i in range(0,len(lexi0)):
-    C[i]=[lexi0[i],1]
-
-lexi0.append('in')
-C.append([lexi0[-1],lexi0[0],lexi0[1],2])
-print(C)
-print(len(C))
-print(len(lexi0))
-
-
-# # Stimuli|Chunk
-
-# In[168]:
-
-stimuli=['123','123','45','12345','45','45','123','45','12345']
-lexi0=['1','2','3','4','5','6']
-
-S_C=stimuli[:]
-for i in range(0,len(stimuli)):
-    S_C[i]=cutting(stimuli[i],lexi0)
-print('Initial Stimuli|Chunk =',S_C)
-    
-C=lexi0[:]
-for i in range(0,len(lexi0)):
-    bit=-C.count(lexi0[i])*np.log2((C.count(lexi0[i])+S_C.count(lexi0[i]))/(len(S_C)+len(C)))
-    C[i]=[lexi0[i],bit]
-print('Initial Chunk =',C)
-
-#search new factorisation
-new_word=lexi0[3]+lexi0[4]
-lexi0=lexi0+[new_word]
-lexi0.reverse()
-C=C+[[new_word,lexi0[3],lexi0[4],0]]
-
-for i in range(0,len(stimuli)):
-    S_C[i]=cutting(stimuli[i],lexi0)
-print('Stimuli|Chunk after factorisation =',S_C)
-
-lexi0.reverse()
-print(len(S_C),len(C),len(lexi0))
-for i in range(0,len(lexi0)):
-    print(C[i][-1])
-    bit=-C.count(lexi0[i])*np.log2((C.count(lexi0[i])+S_C.count(lexi0[i]))/(len(S_C)+len(C)))
-    C[i][-1]=bit
-print('Updated Chunk =',C)
-print('C',C)
-new_bit=-C.count(new_word)*np.log2((C.count(new_word)+S_C.count(new_word))/(len(S_C)+len(C)))
-
-
-
-
-
-# In[143]:
-
-i=0
-print(lexi0)
-print(C)
-print(C.count(lexi0[0]))
-print(-C.count(lexi0[i])*np.log2((C.count(lexi0[i])+S_C.count(lexi0[i]))/(len(S_C)+len(C))))
-
-
-# In[221]:
+# In[221]: MDL CHunker
 
 stimuli=['123','123','45','12345','45','45','123','45','12345']
 lexi0=['1','2','3','4','5','6']
 lexi=lexi0[:]
 
+#Initialisation Stimuli|Chunk
 S_C=stimuli[:]
 for i in range(0,len(stimuli)):
     S_C[i]=cutting(stimuli[i],lexi)
 print('Initial Stimuli|Chunk =',S_C)
 print(' ')
 
+#Initialisation Chunk
 C=lexi[:]
 for i in range(0,len(lexi0)):
     bit=-C.count(lexi[i])*np.log2((C.count(lexi[i])+S_C.count(lexi[i]))/(len(S_C)+len(C)))
@@ -307,24 +225,15 @@ print('Stimuli|Chunk after factorisation =',S_C)
 print(' ')
 lexi.reverse()
 
-
-
-
-
-
-# In[218]:
-
-print(lexi)
-print(' ')
-print(C)
-print(' ')
-print(S_C)
-
-
 # In[235]:
 
 TOTAL=0
 COMP=0
+for k in range(0,len(S_C)):
+    COMP+=len(S_C[k])
+for k in range(0,len(C)):
+    COMP+=len(C[k]['detail'])
+print(COMP)
 for i in range(0,len(lexi)): #compteur du mot lexi[i]
     comptSC=0
     comptC=0
@@ -333,37 +242,13 @@ for i in range(0,len(lexi)): #compteur du mot lexi[i]
     for k in range(0,len(C)):
         if lexi[i] in C[k]['detail']:
             comptC+=1
-    COMP+=comptSC
-    print(lexi[i],comptSC,comptC,COMP)
+    print(lexi[i],comptSC,comptC)
     
-    bit=-comptC*np.log2((comptC+comptSC)/(COMP+len(C)))
+    bit=-comptC*np.log2((comptC+comptSC)/(COMP))
     C[i]['codelenght']=bit
-    TOTAL+=-(comptC+comptSC)*np.log2((comptC+comptSC)/(COMP+len(C)))
+    TOTAL+=-(comptC+comptSC)*np.log2((comptC+comptSC)/(COMP))
 print('Updated Chunk =',C)
 print(TOTAL)
-
-
-# In[236]:
-
-plus=0
-for k in range(0,len(C)):
-    plus+=C[k]['codelenght']
-print(plus)
-
-
-# In[207]:
-
-S_C[0].count(lexi[2])
-
-
-# In[232]:
-
-print(S_C)
-
-
-# In[ ]:
-
-
 
 
 # In[ ]:
