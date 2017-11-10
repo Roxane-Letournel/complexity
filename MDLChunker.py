@@ -65,6 +65,7 @@ string="This process corresponds to an encoding of the input stimuli described u
 string="In this solemn hour it is a consolation to recall and to dwell upon our repeated efforts for peace. All have been ill-starred, but all have been faithful and sincere. This is of the highest moral value--and not only moral value, but practical value--at the present time, because the wholehearted concurrence of scores of millions of men and women, whose co-operation is indispensable and whose comradeship and brotherhood are indispensable, is the only foundation upon which the trial and tribulation of modern war can be endured and surmounted. This moral conviction alone affords that ever-fresh resilience which renews the strength and energy of people in long, doubtful and dark days. Outside, the storms of war may blow and the lands may be lashed with the fury of its gales, but in our own hearts this Sunday morning there is peace. Our hands may be active, but our consciences are at rest. We must not underrate the gravity of the task which lies before us or the temerity of the ordeal, to which we shall not be found unequal. We must expect many disappointments, and many unpleasant surprises, but we may be sure that the task which we have freely accepted is one not beyond the compass and the strength of the British Empire and the French Republic. The Prime Minister said it was a sad day, and that is indeed true, but at the present time there is another note which may be present, and that is a feeling of thankfulness that, if these great trials were to come upon our Island, there is a generation of Britons here now ready to prove itself not unworthy of the days of yore and not unworthy of those great men, the fathers of our land, who laid the foundations of our laws and shaped the greatness of our country." 
 texte=extract_words(string)
 lexi0=initial_lexical(texte)
+stimuli=texte[0:10]
 
 # In[221]: MDL CHunker
 
@@ -77,7 +78,7 @@ def MDL(stimuli,lexi0,a,b):
     S_C,C=initialisation(stimuli,lexi0)
     
     S_C,C,TOTAL=introduce_new_word(a,b,S_C,C)
-    print(C)
+    #print(C)
 
     return TOTAL,C
 
@@ -94,7 +95,7 @@ def update_codelengths(S_C,C):
   #  print('number of chunks in S|C and C = ',ELTS)
   
     DETAIL=[dic['detail'] for dic in C]
-    print(DETAIL)
+    #print(DETAIL)
     WORDS=[dic['word'] for dic in C]
 
     i=-1
@@ -153,7 +154,7 @@ def introduce_new_word(a,b,S_C,C):
 
 
 # In[ ]: factorisation d'un seul stimuli
-def factorisation(stimuli,C):
+#def factorisation(stimuli,C):
     
 
 # In[ ]:
@@ -179,6 +180,9 @@ def countStringOccurence(S_C,s):
 def search(C,stimuli):
     LEXI=[dic['word'] for dic in C]
     best_mdl=1000
+    best_C=C
+    best_a='none'
+    best_b='none'
     for a in range(0,len(LEXI)):
         for b in range(0,len(LEXI)):
             mdl,C_mdl=MDL(stimuli,LEXI,a,b)
@@ -205,4 +209,14 @@ def MDLChunker(lexi0,stimuli):
 
     return C,TOTAL,end_mdl
 
+# In[ ]:
+string="In this solemn hour it is a consolation to recall and to dwell upon our repeated efforts for peace. All have been ill-starred, but all have been faithful and sincere. This is of the highest moral value--and not only moral value, but practical value--at the present time, because the wholehearted concurrence of scores of millions of men and women, whose co-operation is indispensable and whose comradeship and brotherhood are indispensable, is the only foundation upon which the trial and tribulation of modern war can be endured and surmounted. This moral conviction alone affords that ever-fresh resilience which renews the strength and energy of people in long, doubtful and dark days. Outside, the storms of war may blow and the lands may be lashed with the fury of its gales, but in our own hearts this Sunday morning there is peace. Our hands may be active, but our consciences are at rest. We must not underrate the gravity of the task which lies before us or the temerity of the ordeal, to which we shall not be found unequal. We must expect many disappointments, and many unpleasant surprises, but we may be sure that the task which we have freely accepted is one not beyond the compass and the strength of the British Empire and the French Republic. The Prime Minister said it was a sad day, and that is indeed true, but at the present time there is another note which may be present, and that is a feeling of thankfulness that, if these great trials were to come upon our Island, there is a generation of Britons here now ready to prove itself not unworthy of the days of yore and not unworthy of those great men, the fathers of our land, who laid the foundations of our laws and shaped the greatness of our country." 
+texte=extract_words(string)
+lexi0=initial_lexical(texte)
+
+# In[ ]:
+stimuli=texte[0:100]
 MDLChunker(lexi0,stimuli)
+
+
+# In[ ]:
