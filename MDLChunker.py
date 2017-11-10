@@ -7,6 +7,7 @@ import sys
 
 import time
 
+import functools
 # In[98]:rend une liste avec les longueurs de chaque syllabe du lexique
 
 def ll(b):
@@ -31,128 +32,6 @@ def cutting(a,b):
         cutstream+=[b[i]]
         a=a[ll(b)[i]:]
     return cutstream
-
-
-# In[103]: calcule la factorielle de n (entier >= 0)
-
-def fact(n):
-    
-    if n<2:
-        return 1
-    else:
-        return n*fact(n-1)
- 
-
-# In[104]: trouve la complexité d'un texte sachant un lexique
-
-def find_complexity(texte,lexi):
-    union=[]
-    for word in texte:
-        complexity=0
-        union=union+cutting(word,lexi)
-    
-    for syllab in lexi:
-        nboccur=0
-        for i in range(0,len(union)):
-            if union[i]==syllab:
-                nboccur+=1
-            
-        if nboccur!=0:
-            #print('syllabe :',syllab,'apparition =',nboccur,'complexité =',nboccur*np.log2(nboccur/len(union)))
-            complexity=complexity-nboccur*np.log2(nboccur/len(union))
-    return(complexity)
-
-
-# In[105]: première fonction pour proposer un nouveau lexique de longueur de syllabes <=nb
-
-def concatenate(lexi,nb):
-    new_lexi=lexi
-    for i in range(0,len(lexi)-1):
-        for j in range(i+1,len(lexi)):
-            if lexi[i]!=lexi[j]:
-                new_word1=lexi[i]+lexi[j]
-                new_word2=lexi[j]+lexi[i]
-                if new_word1 not in new_lexi and len(new_word1)<=nb:
-                    new_lexi=new_lexi+[new_word1]
-                if new_word2 not in new_lexi and len(new_word2)<=nb:
-                    new_lexi=new_lexi+[new_word2]
-    return new_lexi
-
-
-# In[110]: Propose un nouveau lexique 
-
-def new_lexical(lexi0,best_lexical):
-    lexi=best_lexical+lexi0
-    lexi=list(set(lexi))
-    lexi=sorted(lexi, key=len)
-    lexi.reverse()
-    return lexi
-
-# In[106]: Code principal 1ère version
-
-def find_best_lexical(lexi,texte,nb):
-
-    # Liste des syllabes qu'on envisage de rajouter au lexique 
-    potential=lexi  
-    for k in range(1,2):
-        potential=concatenate(potential,nb)
-
-    cost_lex=0 #Coût du lexique
-
-    # on initialise : complexité pour le lexique initial
-
-    cost_text=find_complexity(texte,lexi)
-    total_cost=cost_text+cost_lex
-    print('Initial complexity =',cost_text)
-    print(' ')
-    i=0
-    temps1=0
-    temps2=0
-    for candidate in potential:
-        i=i+1
-        print(i/len(potential)*100,'%',',','temps restant =',(temps2-temps1)*(len(potential)-i))
-        temps1=time.clock()
-        lexi1=[candidate]+lexi  #on ajoute une syllabe au lexique
-
-        # calcul complexité avec cette syllabe ajoutée            
-        cost_text1=find_complexity(texte,lexi1)
-        #cost_lex1=cost_lex+3*np.log2(3)  # le coût du lexique augmente
-        cost_lex1=0 # on ne tient pas compte de la pénalité du lexique
-        
-
-        if cost_text1+cost_lex1<cost_text+cost_lex:
-            cost_text=cost_text1
-            cost_lex=cost_lex1
-            lexi=lexi1  # si la complexité a été diminuée, la syllabe est effectivement ajoutée au lexique
-           # word=candidate # si la complexité a été diminuée, on retient en mémoire le best cost et on teste les autres
-        temps2=time.clock()
-        
-#Supprimer les mots du lexiques inutiles
-    union=[]
-    for word in texte:
-        complexity=0
-        union=union+cutting(word,lexi)
-        
-
-    compteur=[]
-    for word in lexi:
-        k=union.count(word)
-        compteur.append(k)
-    
-    lexi_used=lexi[:]
-    
-    for i in range(0,len(lexi)):
-        if compteur[i]==0:
-            lexi_used=[l for l in lexi_used if l != lexi[i]]
-    print(compteur)
-    compteur=[i for i in compteur if i != 0]
-        
-    print('Best lexical =',lexi_used)
-    print("Compteurs =",compteur)
-    print('Associated cost =',cost_text)
-
-    return lexi_used
-
 
 
 # In[107]: Traitement du string initial
@@ -190,83 +69,140 @@ lexi0=initial_lexical(texte)
 # In[221]: MDL CHunker
 
 stimuli=['123','123','45','12345','45','45','123','45','12345']
+#lexi0=initial_lexical(stimuli)
 lexi0=['1','2','3','4','5','6']
-lexi=lexi0[:]
 
-#Initialisation Stimuli|Chunk
-S_C=stimuli[:]
-for i in range(0,len(stimuli)):
-    S_C[i]=cutting(stimuli[i],lexi)
-print('Initial Stimuli|Chunk =',S_C)
-print(' ')
-
-#Initialisation Chunk
-C=lexi[:]
-for i in range(0,len(lexi0)):
-    bit=-C.count(lexi[i])*np.log2((C.count(lexi[i])+S_C.count(lexi[i]))/(len(S_C)+len(C)))
-    C[i]={}
-    C[i]['word']=lexi[i]
-    C[i]['codelenght']=bit
-    C[i]['detail']=[lexi[i]]
-print('Initial Chunk =',C)
-print(' ')
-
-#search new factorisation --> lexi[3]+lexi[4]
-new_word=lexi[3]+lexi[4]
-lexi=lexi+[new_word]
-C=C+[{'word': new_word, "detail": [new_word,lexi[3],lexi[4]]}]
-print('New chunk =',C)
-print(' ')
-
-lexi.reverse()
-for i in range(0,len(stimuli)):
-    S_C[i]=cutting(stimuli[i],lexi)
-print('Stimuli|Chunk after factorisation =',S_C)
-print(' ')
-lexi.reverse()
-
-# In[235]:
-
-TOTAL=0
-COMP=0
-for k in range(0,len(S_C)):
-    COMP+=len(S_C[k])
-for k in range(0,len(C)):
-    COMP+=len(C[k]['detail'])
-print(COMP)
-for i in range(0,len(lexi)): #compteur du mot lexi[i]
-    comptSC=0
-    comptC=0
-    for k in range(0,len(S_C)): #compteur du mot lexi[i] dans SC
-        comptSC+=S_C[k].count(lexi[i])
-    for k in range(0,len(C)):
-        if lexi[i] in C[k]['detail']:
-            comptC+=1
-    print(lexi[i],comptSC,comptC)
+def MDL(stimuli,lexi0,a,b):
     
-    bit=-comptC*np.log2((comptC+comptSC)/(COMP))
-    C[i]['codelenght']=bit
-    TOTAL+=-(comptC+comptSC)*np.log2((comptC+comptSC)/(COMP))
-print('Updated Chunk =',C)
-print(TOTAL)
+    S_C,C=initialisation(stimuli,lexi0)
+    
+    S_C,C,TOTAL=introduce_new_word(a,b,S_C,C)
+    print(C)
+
+    return TOTAL,C
+
+TOTAL,C=MDL(stimuli,lexi0,3,4)
+
+# In[235]: Mise à jour codelenghts
+def update_codelengths(S_C,C):
+    TOTAL=0 #Cout total du S_C et C
+    ELTS=0 #Nombre d'éléments dans S_C et C
+    for word in S_C:
+        ELTS+=len(word) #compte le nombre d'éléments dans S_C
+    for word in C:
+        ELTS+=len(word['detail']) #compte le nombre d'éléments dans 
+  #  print('number of chunks in S|C and C = ',ELTS)
+  
+    DETAIL=[dic['detail'] for dic in C]
+    print(DETAIL)
+    WORDS=[dic['word'] for dic in C]
+
+    i=-1
+    for chunk in WORDS: 
+        i+=1
+        comptSC=countStringOccurence(S_C,chunk)
+        comptC=countStringOccurence(DETAIL,chunk)
+
+        #print('Chunk',chunk,':',comptSC,'times in S|C',';',comptC,'times in C')
+        
+        C[i]['codelenght']=-comptC*np.log2((comptC+comptSC)/(ELTS))
+        TOTAL+=-(comptC+comptSC)*np.log2((comptC+comptSC)/(ELTS))
+   # print('Updated Chunk =',C)
+    #print(TOTAL)
+    return C,TOTAL
+
+# In[ ]:
+def initialisation(stimuli,lexi):
+    #Initialisation Stimuli|Chunk
+    S_C=stimuli[:]
+    for i in range(0,len(stimuli)):
+        S_C[i]=cutting(stimuli[i],lexi)
+    
+    #Initialisation Chunk
+    C=lexi[:]
+    for i in range(0,len(lexi)):
+        C[i]={}
+        C[i]['word']=lexi[i]
+        C[i]['detail']=[lexi[i]]
+    
+    C,TOTAL=update_codelengths(S_C,C)
+
+    return S_C,C
+        
+
+
 
 
 # In[ ]:
 
+def introduce_new_word(a,b,S_C,C):
+    new_word=C[a]['word']+C[b]['word']
+    
+    #Update C avec nouveau chunk
+    C.append({'word':new_word,'detail':[new_word,C[a]['word'],C[b]['word']]})
+    
+    #Update S_C avec nouveau chunk
+    C.reverse()
+    for i in range(0,len(stimuli)):
+        S_C[i]=cutting(stimuli[i],[dic['word'] for dic in C])
+    C.reverse()
+    
+    #Udpate codelenghts
+    C,TOTAL=update_codelengths(S_C,C)
+    return(S_C,C,TOTAL)
 
+
+# In[ ]: factorisation d'un seul stimuli
+def factorisation(stimuli,C):
+    
+
+# In[ ]:
+def countStringOccurence(S_C,s):
+    '''
+    Nombre de fois ou le string s apparait dans tous les stimulis
+    '''
+    return sum([e.count(s) for e in S_C])
 
 
 # In[ ]:
+    def counts(S_C):
+        '''
+        Renvoi un dictionnaire contenant le decompte de chaque motif
+   16         {"motif1": 25, "motif2": 30}
 
+'''
+        return functools.reduce(lambda x,y: x+y, map(Counter,S_C))
+    
 
-
+# In[ ]:
+    #Algo de recherche exhaustif:
+def search(C,stimuli):
+    LEXI=[dic['word'] for dic in C]
+    best_mdl=1000
+    for a in range(0,len(LEXI)):
+        for b in range(0,len(LEXI)):
+            mdl,C_mdl=MDL(stimuli,LEXI,a,b)
+            if mdl<=best_mdl:
+                best_mdl=mdl
+                best_a=LEXI[a]
+                best_b=LEXI[b]
+                best_C=C_mdl
+    return best_C,best_mdl, best_a, best_b
 
 # In[ ]:
 
+def MDLChunker(lexi0,stimuli):
+    S_C,C=initialisation(stimuli,lexi0)
+    C,TOTAL=update_codelengths(S_C,C)
+    end_mdl=TOTAL
+    
+    best_C,best_mdl, best_a, best_b=search(C,stimuli)
+    
+    while best_mdl<end_mdl:
+        end_mdl=best_mdl
+        C=best_C
+        best_C,best_mdl, best_a, best_b=search(C,stimuli)
 
+    return C,TOTAL,end_mdl
 
-
-# In[ ]:
-
-
-
+MDLChunker(lexi0,stimuli)
