@@ -1,7 +1,6 @@
 from collections import Counter
 from math import log
 from functools import reduce
-from MDLChunker import initialisation
 
 
 def countCiCjOccurences(s_c, Ci, Cj):
@@ -108,4 +107,3 @@ s_c = [["a", "a", "b"], ["a", "a", "a", "b"], ["a", "b", "b", "a"
                                                ], ["b", "a", "a", "b"]]
 print(opt.optimize(s_c))
 s = "45678 567 147 128 182 118 1132 321 21 2111 2112"
-s_c = initialisation(s, ["1", "2", "3", "4", "5", "6", "7", "8"])
