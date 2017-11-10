@@ -128,7 +128,6 @@ def initialisation(stimuli,lexi):
     C,TOTAL=update_codelengths(S_C,C)
 
     return S_C,C
-        
 
 
 
@@ -153,8 +152,8 @@ def introduce_new_word(a,b,S_C,C):
 
 
 # In[ ]: factorisation d'un seul stimuli
-def factorisation(stimuli,C):
-    
+#def factorisation(stimuli,C):
+
 
 # In[ ]:
 def countStringOccurence(S_C,s):
@@ -165,13 +164,13 @@ def countStringOccurence(S_C,s):
 
 
 # In[ ]:
-    def counts(S_C):
-        '''
-        Renvoi un dictionnaire contenant le decompte de chaque motif
-   16         {"motif1": 25, "motif2": 30}
+def counts(S_C):
+    '''
+    Renvoi un dictionnaire contenant le decompte de chaque motif
+16         {"motif1": 25, "motif2": 30}
 
 '''
-        return functools.reduce(lambda x,y: x+y, map(Counter,S_C))
+    return functools.reduce(lambda x,y: x+y, map(Counter,S_C))
     
 
 # In[ ]:
@@ -189,7 +188,54 @@ def search(C,stimuli):
                 best_C=C_mdl
     return best_C,best_mdl, best_a, best_b
 
+
+
+"""partie Jordan 10/11"""
 # In[ ]:
+# critère de sélection d'un nouveau chunk
+
+#crée la liste des mots différents dans S_C et donne le nombre de mots différents et la longueur du mot le plus long
+def reducedStimuli(S_C):
+    diffS_C=[]
+    maxLen=0
+    for s_c in S_C:
+        if s_c not in diffS_C:
+            diffS_C+=[s_c]
+            if len(s_c)>maxLen:
+                maxLen=len(s_c)
+    return diffS_C,len(diffS_c),maxLen
+
+#probabilité de trouver au moins une fois n'importe quel chunk dans un stimulus 
+# de longueur k, avec un lexique de n chunks en supposant leur apparition
+# équiprobable
+def proba(k,n):
+    return 1-(1-1/n)**k
+
+#pseudo-score d'un chunk s'il apparaît aléatoirement et de façon équiprobable
+def aleaDistrib_Score(S_C,C):
+    diffS_C,nbDiffS_C,maxLen=reducedStimuli(S_C)
+    n=len(C)    #nombre de chunks
+    Sk=[sum([len(diffS_C[i])==k for i in range(len(diffS_C))]) for k in range(1,maxLen+1)]   #contien le nombre de mots de longueur k
+    return (1/nbDiffS_C)*sum([Sk[k-1]*proba(k,n) for k in range(1,maxLen+1)])
+
+#pseudo-score d'un chunk dans la liste réduite S_C = 'bonne' distribution
+# on ajoute 1 s'il est présent au moins une fois dans le mot
+def distribScore(newChunk,S_C): #utiliser C et C[-1] ?
+    score=0
+    diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
+    return sum([newChunk in s_c for s_c in DiffS_C])
+
+#critère pour garder un nouveau chunk qui vient d'être proposé
+def addChunkCrit(newChunk,S_C,C): #remplacer newChunk par C[-1] ?
+    diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
+    threshold=aleaDistrib_Score(S_C,C)
+    return threshold < (1/nbDiffS_C)*distribScore(newChunk,S_C)
+
+
+
+"""fin partie Jordan 10/11"""
+# In[ ]:
+
 
 def MDLChunker(lexi0,stimuli):
     S_C,C=initialisation(stimuli,lexi0)
@@ -205,4 +251,4 @@ def MDLChunker(lexi0,stimuli):
 
     return C,TOTAL,end_mdl
 
-MDLChunker(lexi0,stimuli)
+#MDLChunker(lexi0,stimuli)
