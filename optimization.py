@@ -51,13 +51,14 @@ def lexi(s_c):
 
 
 def replace_s_c(s_c, chunk1, chunk2):
-    sc_2 = []
+    sc_2 = list()
     for mot in s_c:
-        for i in range(len(mot)-2):
-            if mot[i] == chunk1 and mot[i+1] == chunk2:
-                del mot[i+1]
-                mot[i] = chunk1 + chunk2
-        sc_2 += [mot]
+        mot2 = list(mot)
+        for i in range(len(mot2)-2):
+            if mot2[i] == chunk1 and mot2[i+1] == chunk2:
+                del mot2[i+1]
+                mot2[i] = chunk1 + chunk2
+        sc_2 += [mot2]
     return sc_2
 
 
@@ -80,23 +81,19 @@ class Optimizer:
 
         score, s_c, black_list = self.toDo.pop()
         lex = lexi(s_c)
-        new_node = False
+        self.scored_lexi[score] = lex
 
         for chunk1 in lex:
             for chunk2 in lex:
                 if (chunk1, chunk2) not in black_list:
-                    black_list.add((chunk1, chunk2))
                     interm_score = descriptionLengthIncrease(s_c,
                                                              chunk1, chunk2)
-                    if interm_score <= 100:
-                        new_node = True
+                    if interm_score <= 7:
+                        black_list2 = set(black_list)
+                        black_list2.add((chunk1, chunk2))
                         new_score = score + interm_score
                         new_s_c = replace_s_c(s_c, chunk1, chunk2)
-                        self.toDo += [(new_score, new_s_c, black_list)]
-
-        # Sans nouveaux noeud, on enregistre le lexique et son score
-        if not new_node:
-            self.scored_lexi[score] = lex
+                        self.toDo += [(new_score, new_s_c, black_list2)]
 
 
 print("initialise Optimizer")
