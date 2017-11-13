@@ -112,14 +112,36 @@ s = "45678 567 147 128 182 118 1132 321 21 2111 2112"
 class Factorizer:
 
 	def __init__(self, chunks):
-		self.chunks = chunks
+		self.chunks = sorted(chunks, key=lambda t: len(t['word'])) # largest strings first
 
-	def addChunk(self, newChunk):
-		self.chunks += [newChunk]
+	def changeChunks(self, newChunks):
+		self.chunks = sorted(newChunks, key=lambda t: len(t['word'])) # largest strings first
 
-	#def factorize(self, stimulus):
+	def factorize(self, stimulus):
 
-		# first fast factorization
+		# first fast factorization to cut branches faster later
+        bestCost = 0
+        residual = stimulus
+        while(len(residual)!=0):
+            i = 0
+            while (i < len(self.chunks)):
+                if self.chunks[i]['word'] in residual:
+                    bestCost += self.chunks[i]['codelength']
+                    residual.replace(self.chunks[i]['word'], '')
+                    break
+                else
+                    i+=1
+
+        # exploring all factorizations possibles 
+        
+
+
+
+
+
+
+
+
 
 
 
