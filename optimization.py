@@ -65,35 +65,37 @@ def replace_s_c(s_c, chunk1, chunk2):
 class Optimizer:
 
     def __init__(self):
-        self.scored_lexi = {}
+        self.scores = {}
         self.toDo = []
 
     def optimize(self, s_c):
-        self.toDo += [(0, s_c, set())]
+        self.toDo += [(0, s_c, set(), lexi(s_c))]
 
         while self.toDo:
             self.measure()
 
-        score_min = min(self.scored_lexi.keys())
-        return (score_min, self.scored_lexi[score_min])
+        score_min = min(self.scores.keys())
+        return (score_min, self.scores[score_min])
 
     def measure(self):
 
-        score, s_c, black_list = self.toDo.pop()
+        score, s_c, black_list, history = self.toDo.pop()
         lex = lexi(s_c)
-        self.scored_lexi[score] = lex
+        self.scores[score] = (lex, history)
 
         for chunk1 in lex:
             for chunk2 in lex:
                 if (chunk1, chunk2) not in black_list:
                     interm_score = descriptionLengthIncrease(s_c,
                                                              chunk1, chunk2)
-                    if interm_score <= 7:
+                    if interm_score <= 5:
+                        hist2 = list(history)
+                        hist2 += [(chunk1 + chunk2, chunk1, chunk2)]
                         black_list2 = set(black_list)
                         black_list2.add((chunk1, chunk2))
                         new_score = score + interm_score
                         new_s_c = replace_s_c(s_c, chunk1, chunk2)
-                        self.toDo += [(new_score, new_s_c, black_list2)]
+                        self.toDo += [(new_score, new_s_c, black_list2, hist2)]
 
 
 print("initialise Optimizer")
