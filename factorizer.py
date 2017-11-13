@@ -3,6 +3,8 @@ from math import log
 from functools import reduce
 
 
+
+
 def countCiCjOccurences(s_c, Ci, Cj):
     """
         Nombre de fois ou s = CiCj apparait dans s_c
@@ -98,6 +100,7 @@ class Optimizer:
                         self.toDo += [(new_score, new_s_c, black_list2, hist2)]
 
 
+"""
 print("initialise Optimizer")
 opt = Optimizer()
 
@@ -106,36 +109,96 @@ s_c = [["a", "a", "b"], ["a", "a", "a", "b"], ["a", "b", "b", "a"
                                                ], ["b", "a", "a", "b"]]
 print(opt.optimize(s_c))
 s = "45678 567 147 128 182 118 1132 321 21 2111 2112"
-
+"""
 
 
 class Factorizer:
 
-	def __init__(self, chunks):
-		self.chunks = sorted(chunks, key=lambda t: len(t['word'])) # largest strings first
+    def __init__(self, chunks):
+        self.chunks = sorted(chunks, key=lambda t: len(t['word']), reverse=True) # largest strings first
+        self.bestCost = -1
+        self.bestFact = []
+        self.toDo = []
 
-	def changeChunks(self, newChunks):
-		self.chunks = sorted(newChunks, key=lambda t: len(t['word'])) # largest strings first
+    def changeChunks(self, newChunks):
+        self.chunks = sorted(newChunks, key=lambda t: len(t['word']), reverse=True) # largest strings first
 
-	def factorize(self, stimulus):
-
-		# first fast factorization to cut branches faster later
-        bestCost = 0
+    def fastFactorize(self, stimulus):
+        self.bestCost = 0
         residual = stimulus
         while(len(residual)!=0):
+
+            
             i = 0
             while (i < len(self.chunks)):
-                if self.chunks[i]['word'] in residual:
-                    bestCost += self.chunks[i]['codelength']
-                    residual.replace(self.chunks[i]['word'], '')
+                currentChunk = self.chunks[i]['word']
+                beginningOfResidual = residual[:min(len(residual),len(currentChunk))]
+                if currentChunk == beginningOfResidual: 
+                    self.bestCost += self.chunks[i]['codelength']
+                    self.bestFact += [currentChunk]
+                    residual = residual[len(currentChunk):]
                     break
-                else
+                else:
                     i+=1
 
-        # exploring all factorizations possibles 
-        
 
 
+    def factorize(self, stimulus):
+
+        # first fast factorization to cut branches faster later
+        if (self.bestCost < 0):
+            self.fastFactorize(stimulus)
+
+        # initializing toDo list
+        usedChunks = []
+        currentCost = 0
+        self.toDo += [(stimulus, usedChunks, currentCost)]
+
+        # exploring possibilities
+
+        while self.toDo:
+
+            residual, usedChunks, currentCost = self.toDo.pop()
+
+            for chunk in self.chunks:
+
+                if chunk == residual[:min(len(residual),len(chunk))]:
+
+                    if (currentCost + chunk['codelength']) < self.bestCost:
+
+                        currentCost += chunk['codelength']
+                        residual = residual[len(chunk):]
+                        usedChunks += [chunk]
+
+                        if not residual: 
+                            if currentCost < self.bestCost:
+                                self.bestCost = currentCost
+                                self.bestFact = usedChunks
+                        else:
+                            self.toDo += [(residual, usedChunks, currentCost)]
+
+
+
+
+C = [
+{'word': "aaaa", 'codelength':5},
+{'word': "a", 'codelength':2}, 
+{'word': "b", 'codelength':1}, 
+{'word': "c", 'codelength':7}, 
+{'word': "ccc", 'codelength':10}
+]
+
+C = {}
+
+stimulus = "aaaabcccaa"
+
+print("initialise Factorizer")
+fact = Factorizer(C)
+fact.factorize(stimulus)
+
+print(stimulus)
+print(fact.bestCost)
+print(fact.bestFact)
 
 
 
