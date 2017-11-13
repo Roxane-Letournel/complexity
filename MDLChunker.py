@@ -203,7 +203,7 @@ def reducedStimuli(S_C):
             diffS_C+=[s_c]
             if len(s_c)>maxLen:
                 maxLen=len(s_c)
-    return diffS_C,len(diffS_c),maxLen
+    return diffS_C,len(diffS_C),maxLen
 
 #probabilité de trouver au moins une fois n'importe quel chunk dans un stimulus 
 # de longueur k, avec un lexique de n chunks en supposant leur apparition
@@ -223,13 +223,13 @@ def aleaDistrib_Score(S_C,C):
 def distribScore(newChunk,S_C): #utiliser C et C[-1] ?
     score=0
     diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
-    return sum([newChunk in s_c for s_c in DiffS_C])
+    return (1/nbDiffS_C)*sum([newChunk in s_c for s_c in diffS_C])
 
 #critère pour garder un nouveau chunk qui vient d'être proposé
 def addChunkCrit(newChunk,S_C,C): #remplacer newChunk par C[-1] ?
     diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
     threshold=aleaDistrib_Score(S_C,C)
-    return threshold < (1/nbDiffS_C)*distribScore(newChunk,S_C)
+    return threshold < distribScore(newChunk,S_C)
 
 
 
