@@ -107,7 +107,7 @@ class Optimizer:
                             'detail': [new_chunk, chunk1, chunk2]}]
                     interm_score = descriptionLengthIncrease(s_c, c2,
                                                              chunk1, chunk2)
-                    if score + interm_score <= 0:
+                    if interm_score < 0:
                         black_list2 = set(black_list)
                         black_list2.add((chunk1, chunk2))
                         new_score = score + interm_score
