@@ -7,9 +7,12 @@ class Factorizer:
         self.bestFact = []
         self.toDo = []
 
-    def changeChunks(self, newChunks):
+    def setChunks(self, newChunks):
         self.chunks = sorted(newChunks, key=lambda t: len(t['word']), reverse=True) # largest strings first
 
+    def getBestFact(self):
+        return self.bestFact
+        
     def fastFactorize(self, stimulus):
         self.bestCost = 0
         residual = stimulus
@@ -54,6 +57,8 @@ class Factorizer:
 
 if __name__ == '__main__':
 
+
+"""
     C = [
     {'word': "aaaa", 'codelength':3},
     {'word': "a", 'codelength':5}, 
@@ -72,3 +77,7 @@ if __name__ == '__main__':
     print("C = ", C)
     print("stimulus = ", stimulus)
     print("Factorization = ", fact.bestFact, " (cost: ", fact.bestCost, ")")
+
+"""
+
+
