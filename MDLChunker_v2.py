@@ -29,17 +29,6 @@ stimuli=['123','123','45','12345','45','45','123','45','12345']
 #lexi0=initial_lexical(stimuli)
 lexi0=['1','2','3','4','5','6']
 
-# In[221]: MDL en ajoutant nouveau chunk
-def MDL(stimuli,lexi0,a,b):
-    
-    S_C,C=initialisation(stimuli,lexi0)
-    
-    S_C,C,TOTAL=introduce_new_word(a,b,S_C,C)
-
-    return TOTAL,C,S_C
-
-TOTAL,C,S_C=MDL(stimuli,lexi0,3,4)
-
 # In[235]: Mise à jour codelengths
 def update_codelengths(S_C,C):
     TOTAL=0 #Cout total du S_C et C
@@ -91,99 +80,6 @@ def initialisation(stimuli,lexi):
     return S_C,C,TOTAL
 
 initialisation(stimuli,lexi0)
-# In[ ]:
-
-def introduce_new_word(a,b,S_C,C):
-    new_word=C[a]['word']+C[b]['word']
-    
-    #Update C avec nouveau chunk
-    C.append({'word':new_word,'detail':[new_word,C[a]['word'],C[b]['word']]})
-    
-    #Update S_C avec nouveau chunk
-    C.reverse()
-    for i in range(0,len(stimuli)):
-        S_C[i]=cutting(stimuli[i],[dic['word'] for dic in C])
-    C.reverse()
-    
-    #Udpate codelenghts
-    C,TOTAL,S_C=update_codelengths(S_C,C)
-    return(S_C,C,TOTAL)
-
-
-# In[ ]: Recherche exhaustive de nouveau chunk
-
-def search(C,stimuli):
-    LEXI=[dic['word'] for dic in C]
-    best_mdl=1000000
-    best_a=0
-    best_b=0
-    best_C=C[:]
-    best_S_C=S_C[:]
-    for a in range(0,len(LEXI)):
-        print('recherche en cours...',a/len(LEXI))
-        for b in range(0,len(LEXI)):
-            mdl,C_mdl,S_C_mdl=MDL(stimuli,LEXI,a,b)
-            if mdl<=best_mdl:
-                best_mdl=mdl
-                best_a=LEXI[a]
-                best_b=LEXI[b]
-                best_C=C_mdl[:]
-                best_S_C=S_C_mdl[:]
-    return best_C,best_mdl, best_a, best_b, best_S_C
-
-# In[ ]:
-'''MDL Chunker avec recherche exhaustive'''
-
-def MDLChunker(lexi0,stimuli):
-    S_C,C=initialisation(stimuli,lexi0)
-    C,TOTAL,S_C=update_codelengths(S_C,C)
-    end_mdl=TOTAL
-    
-    best_C,best_mdl, best_a, best_b,best_S_C=search(C,stimuli)
-    print(TOTAL,best_mdl,best_C,best_S_C)
-    
-    while best_mdl<end_mdl:
-        end_mdl=best_mdl
-        C=best_C[:]
-        S_C=best_S_C[:]
-        best_C,best_mdl, best_a, best_b,best_S_C=search(C,stimuli)
-
-    return C,S_C,TOTAL,end_mdl
-
-C,S_C,TOTAL,end_mdl=MDLChunker(lexi0,texte[0:30])
-#C,S_C,TOTAL,end_mdl=MDLChunker(lexi0,stimuli)
-
-# In[ ]:
-'''MDL Chunker avec optimization'''
-    
-def MDLChunker_optimized(lexi0,stimuli):
-    S_C,C=initialisation(stimuli,lexi0)
-    C,TOTAL,S_C=update_codelengths(S_C,C)
-    end_mdl=TOTAL
-    
-    score,new_WORDS=opt.optimize(S_C,C)
-    opt_S_C=S_C[:]
-    opt_C=C[:]
-    for new_words in new_WORDS[1]:
-        if isinstance(new_words,tuple):
-            print(new_words)
-            chunk1=new_words[1]
-            chunk2=new_words[2]
-            WORDS=[dic['word'] for dic in opt_C]
-            a=WORDS.index(chunk1)
-            b=WORDS.index(chunk2)
-            opt_S_C,opt_C,opt_mdl=introduce_new_word(a,b,opt_S_C,opt_C)
-    
-    
-    if opt_mdl<end_mdl:
-        end_mdl=opt_mdl
-        C=opt_C
-        S_C=opt_S_C
-
-
-    return C,S_C,TOTAL,end_mdl
-
-C,S_C,TOTAL,end_mdl=MDLChunker(lexi0,stimuli)
     
     
 # In[ ]: 
@@ -212,12 +108,9 @@ def MDLChunker_optimized_factorized(all_stimuli):
         opt_S_C, opt_C = opt.optimize(S_C, C)
         opt_C,opt_mdl,opt_S_C=update_codelengths(opt_S_C,opt_C)
 
-        #Fonction d'optimisation pour trouver les nouveaux chunks
-        
-        #opt_C,opt_mdl,opt_S_C=update_codelengths(S_C,C)
         
         if opt_mdl<TOTAL:
-            print(opt_C)
+            print(k,stimuli,opt_C)
             end_mdl=opt_mdl
             C=opt_C
             S_C=opt_S_C
@@ -226,7 +119,7 @@ def MDLChunker_optimized_factorized(all_stimuli):
     print(' ')
     print('C final =',C)
             
-    return TOTAL,end_mdl
+    return C,S_C,TOTAL,end_mdl
     
     
 MDLChunker_optimized_factorized(all_stimuli)
@@ -235,7 +128,7 @@ MDLChunker_optimized_factorized(all_stimuli)
 # In[ ]: 
 '''MDL Chunker avec distribution'''
 
-C,S_C,TOTAL,end_mdl=MDLChunker(lexi0,stimuli)
+C,S_C,TOTAL,end_mdl=MDLChunker_optimized_factorized(all_stimuli)
 
 def scan_MDL_distribution(C,S_C):    
     WORDS=[dic['word'] for dic in C]
