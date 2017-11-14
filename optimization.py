@@ -61,11 +61,17 @@ def lexi(s_c):
 def replace_s_c(s_c, chunk1, chunk2):
     sc_2 = list()
     for mot in s_c:
-        mot2 = list(mot)
-        for i in range(len(mot2)-1):
-            if mot2[i] == chunk1 and mot2[i+1] == chunk2:
-                del mot2[i+1]
-                mot2[i] = chunk1 + chunk2
+        mot2 = list()
+        skip = False
+        for i in range(len(mot)):
+            if skip:
+                skip = False
+                continue
+            if i < len(mot) - 1 and mot[i] == chunk1 and mot[i+1] == chunk2:
+                mot2 += [chunk1 + chunk2]
+                skip = True
+            else:
+                mot2 += [mot[i]]
         sc_2 += [mot2]
     return sc_2
 
