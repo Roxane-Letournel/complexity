@@ -105,13 +105,14 @@ class Optimizer:
                         new_s_c = replace_s_c(s_c, chunk1, chunk2)
                         self.toDo += [(new_score, new_s_c, black_list2, c2)]
 
+if __name__ == '__main__':
 
-print("initialise Optimizer")
-opt = Optimizer()
+    print("initialise Optimizer")
+    opt = Optimizer()
 
-s = ["aab aaab abba baab"]
-s_c = [["c", "a", "b"], ["a", "c", "a", "b"], ["a", "b", "c", "c"],
-       ["b", "c", "a", "b"], ['a', 'b'], ['a', 'b']]
-c = [{"word": "a", "detail": ["a"]}, {"word": "b", "detail": ["b"]},
-     {"word": "c", "detail": ["c"]}]
-print(opt.optimize(s_c, c))
+    s = ["aab aaab abba baab"]
+    s_c = [["c", "a", "b"], ["a", "c", "a", "b"], ["a", "b", "c", "c"],
+           ["b", "c", "a", "b"], ['a', 'b'], ['a', 'b']]
+    c = [{"word": "a", "detail": ["a"]}, {"word": "b", "detail": ["b"]},
+         {"word": "c", "detail": ["c"]}]
+    print(opt.optimize(s_c, c))
