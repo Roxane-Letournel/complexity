@@ -38,16 +38,47 @@ def descriptionLengthIncrease(s_c, c, Ci, Cj):
     N_CibCj = N_Cj - N_CiCj
 
     # Ci ou Cj ne sont pas des chunks - operation invalide
+
+    # formules differentes si Ci==Cj
+
     if N_Ci * N_Cj * N_CiCj == 0:
         return 1000000
 
+
+    
     L1 = N_CiCj * (log2((N + 3 - N_CiCj)/(N_CiCj + 1))
                    - log2(N/N_Ci) - log2(N/N_Cj))
-    L2 = N_CibCj * (log2((N + 3 + N_CiCj)/(N_CibCj + 1)) - log2(N/N_Ci))
-    L2 += N_bCiCj * (log2((N + 3 - N_CiCj)/(N_bCiCj + 1)) - log2(N/N_Cj))
+    L2 = N_CibCj * (log2((N + 3 - N_CiCj)/(N_CibCj + 1)) - log2(N/N_Ci))
+    if Ci!=Cj:
+        L2 += N_bCiCj * (log2((N + 3 - N_CiCj)/(N_bCiCj + 1)) - log2(N/N_Cj))
+
     L3 = 3 * log2(N + 3 - N_CiCj) - log2((N_CiCj + 1) * (N_bCiCj + 1
                                                          ) * (N_CibCj + 1))
-    L4 = (N - N_Ci - N_Cj) * log2((N + 3 + N_CiCj)/N)
+    if Ci==Cj:
+        L4 = (N - N_Ci) * log2((N + 3 - N_CiCj)/N)
+    else:
+        L4 = (N - N_Ci - N_Cj) * log2((N + 3 - N_CiCj)/N)
+    
+
+
+    """
+    L1 = N_CiCj * (log2((N + 3 - N_CiCj)/(N_CiCj + 1))
+                   - log2(N/N_Ci) - log2(N/N_Cj))
+    L2 = N_CibCj * (log2((N + 3 - N_CiCj)/(N_CibCj + 1)) - log2(N/N_Ci))
+    L2 += N_bCiCj * (log2((N + 3 - N_CiCj)/(N_bCiCj + 1)) - log2(N/N_Cj))
+
+    L3 = 3 * log2(N + 3 - N_CiCj) - log2((N_CiCj + 1) * (N_bCiCj + 1
+                                                         ) * (N_CibCj + 1))
+    L4 = (N - N_Ci - N_Cj) * log2((N + 3 - N_CiCj)/N)
+    """
+
+
+    """
+    print("L1 = ", L1)
+    print("L2 = ", L2)
+    print("L3 = ", L3)
+    print("L4 = ", L4)
+    """
     return L1 + L2 + L3 + L4
 
 
@@ -70,35 +101,50 @@ def replace_s_c(s_c, chunk1, chunk2):
 class Optimizer:
 
     def __init__(self):
-        self.scores = {}
         self.toDo = []
+        self.black_list = set()
+        self.minS_C = []
+        self.min_C = []
+        self.minS_C_score = 10
 
     def optimize(self, s_c, c):
         self.scores = {}
         self.toDo = []
+        self.toDo += [(0, s_c, self.black_list, c)]
 
-        self.toDo += [(0, s_c, set(), c)]
-        while self.toDo:
+        """
+        self.measure()
+        for i in range(len(self.toDo)):
             self.measure()
-
-        score_min = max(self.scores.keys())
-        return self.scores[score_min]
+        """
+        i = 0
+        while self.toDo and i < 5000000:
+            i += 1
+            #print(len(self.toDo))
+            self.measure()
+        print("***************", i)
+        return self.minS_C, self.min_C
 
     def measure(self):
 
         score, s_c, black_list, c = self.toDo.pop()
         lex = lexi(s_c)
-        self.scores[score] = (s_c, c)
+        if score < self.minS_C_score:
+            self.black_list = black_list
+            self.minS_C = s_c
+            self.min_C = c
+
         for chunk1 in lex:
             for chunk2 in lex:
                 if (chunk1, chunk2) not in black_list:
                     interm_score = descriptionLengthIncrease(s_c, c,
                                                              chunk1, chunk2)
-                    if score + interm_score <= 10:
+                    #print("***** interm_score(", chunk1, ",", chunk2, ") = ", interm_score)
+                    if interm_score < 0:
                         c2 = c[:]
                         new_chunk = chunk1 + chunk2
                         c2 += [{'word': new_chunk,
-                                'detail': [new_chunk, chunk1, chunk2]}]
+                            'detail': [new_chunk, chunk1, chunk2]}]
                         black_list2 = set(black_list)
                         black_list2.add((chunk1, chunk2))
                         new_score = score + interm_score

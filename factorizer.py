@@ -13,9 +13,6 @@ class Factorizer:
         self.bestFact = []
         self.toDo = []
 
-    def getBestFact(self):
-        return self.bestFact
-        
     def fastFactorize(self, stimulus):
         self.bestCost = 0
         residual = stimulus
@@ -29,7 +26,10 @@ class Factorizer:
                     break
             if residual and previousResidual == residual:
                 raise NameError("Can't factorize: C is incomplete (missing canonical chunks)")
-
+                
+    def getBestFact(self):
+        return self.bestFact
+    
     def factorize(self, stimulus):
 
         # first fast factorization to cut branches faster later
@@ -60,12 +60,7 @@ class Factorizer:
 
 if __name__ == '__main__':
 
-<<<<<<< Updated upstream:factorization.py
-
-"""
-=======
     """
->>>>>>> Stashed changes:factorizer.py
     C = [
     {'word': "aaaa", 'codelength':3},
     {'word': "a", 'codelength':5}, 
@@ -84,12 +79,6 @@ if __name__ == '__main__':
     print("C = ", C)
     print("stimulus = ", stimulus)
     print("Factorization = ", fact.bestFact, " (cost: ", fact.bestCost, ")")
-<<<<<<< Updated upstream:factorization.py
-
-"""
-
-
-=======
     """
 
     C = [{'word': 'a', 'detail': ['a'], 'codelength': 5.6234073537484237}, 
@@ -106,4 +95,3 @@ if __name__ == '__main__':
     print("C = ", C)
     print("stimulus = ", stimulus)
     print("Factorization = ", fact.bestFact, " (cost: ", fact.bestCost, ")")
->>>>>>> Stashed changes:factorizer.py
