@@ -9,6 +9,9 @@ class Factorizer:
 
     def changeChunks(self, newChunks):
         self.chunks = sorted(newChunks, key=lambda t: len(t['word']), reverse=True) # largest strings first
+        self.bestCost = -1
+        self.bestFact = []
+        self.toDo = []
 
     def fastFactorize(self, stimulus):
         self.bestCost = 0
