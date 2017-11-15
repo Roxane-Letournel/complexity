@@ -62,7 +62,7 @@ def extract_words(string):
     string=string.replace('!','')
     string=string.replace('-','')
     string=string.lower()
-    texte=string.split( )
+    texte=string.split(' ')
     return texte
 
 

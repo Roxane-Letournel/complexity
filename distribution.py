@@ -32,9 +32,12 @@ def proba(k,n):
 #pseudo-score d'un chunk s'il apparaît aléatoirement et de façon équiprobable
 def aleaDistrib_Score(S_C,C):
     diffS_C,nbDiffS_C,maxLen=reducedStimuli(S_C)
+    #maxLen=max(map(len,S_C))
     n=len(C)    #nombre de chunks
     Sk=[sum([len(diffS_C[i])==k for i in range(len(diffS_C))]) for k in range(1,maxLen+1)]   #contien le nombre de mots de longueur k
     return (1/nbDiffS_C)*sum([Sk[k-1]*proba(k,n) for k in range(1,maxLen+1)])
+    #Sk=[sum([len(S_C[i])==k for i in range(len(S_C))]) for k in range(1,maxLen+1)]   #contien le nombre de mots de longueur k
+    #return (1/len(S_C))*sum([Sk[k-1]*proba(k,n) for k in range(1,maxLen+1)])
 
 #pseudo-score d'un chunk dans la liste réduite S_C = 'bonne' distribution
 # on ajoute 1 s'il est présent au moins une fois dans le mot
@@ -48,7 +51,7 @@ def addChunkCrit(newChunk,S_C,C): #remplacer newChunk par C[-1] ?
     diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
     threshold=aleaDistrib_Score(S_C,C)
     return threshold < (1/nbDiffS_C)*distribScore(newChunk,S_C)
-
+    #return (1/nbDiffS_C)*distribScore(newChunk,S_C)
 
 
 """fin partie Jordan 10/11"""
