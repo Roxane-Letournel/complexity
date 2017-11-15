@@ -4,12 +4,18 @@ Created on Tue Nov 14 11:29:31 2017
 
 @author: roxan
 """
+
 import MDLChunker_v3
+
 import optimization
 import fonctions_aux
 import distribution
 import factorizer
+
 import matplotlib.pylab as plt
+
+
+
 # In[ ]:  
 '''Test de l'article'''
 texte=['123','123','45','12345','45','45','123','45','12345']
@@ -123,3 +129,4 @@ print(y)
 ##print('Chunks :',[dic['word'] for dic in C])
 ##print('Stimuli|Chunk :',S_C)
 #print('Final codelength =',TOTAL)
+
