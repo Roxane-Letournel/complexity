@@ -65,7 +65,7 @@ def initialisation(stimuli,lexi):
 
     return S_C,C,TOTAL
 
-
+initialisation(stimuli,lexi0)
     
 # In[ ]: 
 '''MDL avec ajout de mots'''
@@ -104,7 +104,7 @@ def MDLChunker_search_factorized(all_stimuli):
 # In[ ]: 
 '''MDL avec ajout de mots'''
 
-def MDLChunker_search_factorized_distribution(all_stimuli):
+def MDLChunker_search_factorized_distribution(all_stimuli,alpha):
     lexi0=initial_lexical(all_stimuli)
     stimuli=all_stimuli[0]
     S_C,C,TOTAL=initialisation(stimuli,lexi0) #fonction initialisation : modifier cutting avec 
@@ -125,7 +125,7 @@ def MDLChunker_search_factorized_distribution(all_stimuli):
         
         best_C,best_mdl, best_a, best_b, best_S_C, best_word=search(S_C,C)
         
-        while best_mdl<TOTAL and addChunkCrit(best_word,best_S_C,best_C):
+        while best_mdl<TOTAL and addChunkCrit(best_word,best_S_C,best_C,alpha):
            # print(k,stimuli,opt_C)
             end_mdl=best_mdl
             C=best_C
@@ -135,7 +135,7 @@ def MDLChunker_search_factorized_distribution(all_stimuli):
     return C,S_C,TOTAL
     
     
-#print(MDLChunker_search_factorized_distribution(all_stimuli))
+print(MDLChunker_search_factorized_distribution(all_stimuli,alpha))
 
 # In[ ]:
 
@@ -189,14 +189,40 @@ def search(S_C,C):
 
 #C,S_C,TOTAL,end_mdl=MDLChunker_optimized_factorized(all_stimuli)
 
-def scan_MDL_distribution(C,S_C):    
+def scan_MDL_distribution(C,S_C,alpha):    
     WORDS=[dic['word'] for dic in C]
     for chunk in WORDS:
-        print(chunk,addChunkCrit(chunk,S_C,C))
+        print(chunk,addChunkCrit(chunk,S_C,C,alpha))
             
         #print('Probability of chunk',chunk,'is larger than an random distribution',addChunkCrit(chunk,S_C,C))
     return 
 
-scan_MDL_distribution(C,S_C)
+scan_MDL_distribution(C,S_C,1)
 
 # In[ ]:
+
+# In[ ]:
+def initialisationTOTAL(all_stimuli,lexi):
+
+    S_C=[]
+    
+    #Initialisation Chunk
+    C=lexi[:]
+    for i in range(0,len(lexi)):
+        C[i]={}
+        C[i]['word']=lexi[i]
+        C[i]['detail']=[lexi[i]]
+        C[i]['codelength']=1
+    
+    #Initialisation Stimuli|Chunk
+    #print(C)
+    for stimulus in all_stimuli:
+        fact=Factorizer(C)
+        fact.factorize(stimulus)
+        S_C.append(fact.getBestFact())
+    
+    C,TOTAL,S_C=update_codelengths(S_C,C)
+
+    return S_C,C,TOTAL
+
+initialisationTOTAL(all_stimuli,lexi0)

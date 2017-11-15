@@ -47,10 +47,10 @@ def distribScore(newChunk,S_C): #utiliser C et C[-1] ?
     return sum([newChunk in s_c for s_c in diffS_C])
 
 #critère pour garder un nouveau chunk qui vient d'être proposé
-def addChunkCrit(newChunk,S_C,C): #remplacer newChunk par C[-1] ?
+def addChunkCrit(newChunk,S_C,C,alpha): #remplacer newChunk par C[-1] ?
     diffS_C, nbDiffS_C,maxLen=reducedStimuli(S_C)
     threshold=aleaDistrib_Score(S_C,C)
-    return threshold < (1/nbDiffS_C)*distribScore(newChunk,S_C)
+    return alpha*threshold < (1/nbDiffS_C)*distribScore(newChunk,S_C)
     #return (1/nbDiffS_C)*distribScore(newChunk,S_C)
 
 
