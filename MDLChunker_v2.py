@@ -6,7 +6,7 @@ import functools
 from fonctions_aux import *
 import distribution
 from optimization import Optimizer
-from factorizer import Factorizer
+from factorization import Factorizer
 
 stimuli=['123','123','45','12345','45','45','123','45','12345']
 #lexi0=initial_lexical(stimuli)
