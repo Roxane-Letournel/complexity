@@ -35,7 +35,7 @@ def descriptionLengthIncrease(s_c, c, Ci, Cj):
     N = sum(decomptes.values())
     N_Ci = decomptes[Ci]
     N_Cj = decomptes[Cj]
-    N_CiCj = countCiCjOccurences(ensembleChunk,  Ci,  Cj)
+    N_CiCj = countCiCjOccurences(ensembleChunk, Ci, Cj)
     N_bCiCj = N_Ci - N_CiCj
     N_CibCj = N_Cj - N_CiCj
 
@@ -43,13 +43,13 @@ def descriptionLengthIncrease(s_c, c, Ci, Cj):
     if N_Ci * N_Cj * N_CiCj == 0:
         return 1000000
 
-    L1 = N_CiCj * (log2((N + 3 - N_CiCj)/(N_CiCj + 1))
-                   - log2(N/N_Ci) - log2(N/N_Cj))
-    L2 = N_CibCj * (log2((N + 3 + N_CiCj)/(N_CibCj + 1)) - log2(N/N_Ci))
-    L2 += N_bCiCj * (log2((N + 3 - N_CiCj)/(N_bCiCj + 1)) - log2(N/N_Cj))
+    L1 = N_CiCj * (log2((N + 3 - N_CiCj) / (N_CiCj + 1))
+                   - log2(N / N_Ci) - log2(N / N_Cj))
+    L2 = N_CibCj * (log2((N + 3 + N_CiCj) / (N_CibCj + 1)) - log2(N / N_Ci))
+    L2 += N_bCiCj * (log2((N + 3 - N_CiCj) / (N_bCiCj + 1)) - log2(N / N_Cj))
     L3 = 3 * log2(N + 3 - N_CiCj) - log2((N_CiCj + 1) * (N_bCiCj + 1
                                                          ) * (N_CibCj + 1))
-    L4 = (N - N_Ci - N_Cj) * log2((N + 3 - N_CiCj)/N)
+    L4 = (N - N_Ci - N_Cj) * log2((N + 3 - N_CiCj) / N)
 
     return L1 + L2 + L3 + L4
 
@@ -67,7 +67,7 @@ def replace_s_c(s_c, chunk1, chunk2):
             if skip:
                 skip = False
                 continue
-            if i < len(mot) - 1 and mot[i] == chunk1 and mot[i+1] == chunk2:
+            if i < len(mot) - 1 and mot[i] == chunk1 and mot[i + 1] == chunk2:
                 mot2 += [chunk1 + chunk2]
                 skip = True
             else:
