@@ -28,6 +28,8 @@ class Factorizer:
                     residual = residual[len(chunk['word']):]
                     break
             if residual and previousResidual == residual:
+            	# missing some canonical chunks to perform factorization
+            	#self.completeChunksWithCanonicals()
                 raise NameError("Can't factorize: C is incomplete (missing canonical chunks)")
 
     def factorize(self, stimulus):
